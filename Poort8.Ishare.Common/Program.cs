@@ -8,9 +8,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 
-builder.Services.AddSingleton<ICertificateProvider, CertificateProvider>();
-builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
-builder.Services.AddSingleton<ISchemeOwnerService, SchemeOwnerService>();
+builder.Services.AddIshareCoreServices();
 
 var app = builder.Build();
 

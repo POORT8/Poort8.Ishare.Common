@@ -10,13 +10,13 @@ namespace Poort8.Ishare.Common.Token;
 public class TokenController : ControllerBase
 {
     private readonly ILogger<TokenController> _logger;
-    private readonly AuthenticationService _authenticationService;
-    private readonly SchemeOwnerService _schemeOwnerService;
+    private readonly IAuthenticationService _authenticationService;
+    private readonly ISchemeOwnerService _schemeOwnerService;
 
     public TokenController(
         ILogger<TokenController> logger,
-        AuthenticationService authenticationService,
-        SchemeOwnerService schemeOwnerService)
+        IAuthenticationService authenticationService,
+        ISchemeOwnerService schemeOwnerService)
     {
         _logger = logger;
         _authenticationService = authenticationService;
@@ -73,13 +73,7 @@ public class TokenController : ControllerBase
         try
         {
             var token = _authenticationService.CreateAccessToken(request.ClientId);
-
-            var tokenResponse = new TokenResponse()
-            {
-                AccessToken = token,
-                TokenType = "Bearer",
-                ExpiresIn = 3600
-            };
+            var tokenResponse = new TokenResponse(token);
 
             _logger.LogInformation("Returning ok with token response {token}", token);
             return new OkObjectResult(tokenResponse);

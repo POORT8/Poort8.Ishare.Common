@@ -8,8 +8,13 @@ public class TokenResponse
     public string AccessToken { get; set; }
 
     [JsonPropertyName("token_type")]
-    public string TokenType { get; set; }
+    public string TokenType { get; } = "Bearer";
 
     [JsonPropertyName("expires_in")]
-    public int ExpiresIn { get; set; }
+    public int ExpiresIn { get; } = 3600;
+
+    public TokenResponse(string accessToken)
+    {
+        AccessToken = accessToken;
+    }
 }
