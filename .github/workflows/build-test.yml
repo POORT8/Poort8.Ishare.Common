@@ -18,9 +18,9 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore Poort8.Ishare.Common.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build Poort8.Ishare.Common.sln --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test Poort8.Ishare.Common.sln --no-build --verbosity normal
       
