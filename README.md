@@ -9,7 +9,7 @@ The project contains the *common endpoints* of the [iSHARE scheme](https://dev.i
 ## Getting Started
 
  1. First you need to have an iSHARE test certificate. You can request one [here](https://dev.ishareworks.org/demo-and-testing/test-certificates.html).
- 2. For now, the certificate is provided to the docker container as a (secret) environment variable. Extract the the byte stream from the certificate file (p12 of pfx). For example using PowerShell:
+ 2. For now, the certificate is provided to the docker container as a (secret) environment variable. Extract the byte stream from the certificate file (p12 of pfx). For example using PowerShell:
 ```
 $fileContentBytes = Get-Content <test-certificate.p12> -Encoding Byte -Raw
 [System.Convert]::ToBase64String($fileContentBytes) | Out-File <test-certificate.p12-bytes.txt>
