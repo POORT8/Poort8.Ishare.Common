@@ -26,3 +26,7 @@ docker pull ghcr.io/poort8/poort8.ishare.common:latest
     - CertificatePassword > The password of the iSHARE test certificate.
     - CertificateChain > The certificates of the [iSHARE Test CA](https://dev.ishareworks.org/demo-and-testing/test-certificates.html#ishare-test-ca) as a comma separeted byte stream. Use step 2 to get these. In case your certificate is issued by _C=NL, O=iSHARE Foundation, CN=TEST iSHARE Foundation PKIoverheid Organisatie Server CA - G3_, you can use [this](https://raw.githubusercontent.com/POORT8/Poort8.Ishare.Common/master/ishare-test-ca-chain.txt) chain.
     - CertificateChainPassword > Empty string for public test certificates: ""
+
+## Acknowledgements
+
+This package was developed with partial funding from the Dutch Topsector Logistics.
