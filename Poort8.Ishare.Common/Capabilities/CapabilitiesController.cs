@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace Poort8.Ishare.Common.Capabilities;
 
@@ -29,22 +31,50 @@ public class CapabilitiesController : ControllerBase
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	public async Task<IActionResult> Get()
+	public IActionResult Get()
 	{
 		_logger.LogInformation("CapabilitiesRequest received");
 
         var authorization = Request.Headers.Authorization;
 
-        var errorResponse = HandleAuthorization(authorization, out string audience);
+        var errorResponse = HandleAuthorization(authorization, out string? audience);
         if (errorResponse is not null) return errorResponse;
 
-        var token = _authenticationService.CreateClientAssertion(audience);
+        var capabilitiesInfo = new CapabilitiesInfo(_configuration["ClientId"], new List<string> { _configuration["IshareRole"] }, _configuration["ApiVersion"]);
+        var publicEndpoints = new List<Endpoint>
+        {
+            new Endpoint(_configuration["TokenEndpointId"], "access token", "Obtains access token", _configuration["TokenEndpointUrl"]),
+            new Endpoint(_configuration["CapabilitiesEndpointId"], "capabilities", "Retrieves iSHARE capabilities", _configuration["CapabilitiesEndpointUrl"], _configuration["TokenEndpointUrl"])
+        };
+        publicEndpoints.AddRange(RetrieveEndpointsFromConfig(_configuration["PublicEndpoints"]));
+        capabilitiesInfo.SupportedVersions.First().SupportedFeatures.First().Public.AddRange(publicEndpoints);
 
+        if (audience is not null)
+        {
+            capabilitiesInfo.SupportedVersions.First().SupportedFeatures.First().Restricted = RetrieveEndpointsFromConfig(_configuration["PrivateEndpoints"]);
+        }
+        var additionalClaims = new List<Claim> { new Claim("capabilities_info", JsonSerializer.Serialize(capabilitiesInfo), JsonClaimValueTypes.Json) };
+
+        var token = _authenticationService.CreateClientAssertion(audience);
         var capabilitiesResponse = new CapabilitiesResponse(token);
 		return new OkObjectResult(capabilitiesResponse);
 	}
 
-    private IActionResult? HandleAuthorization(StringValues authorization, out string audience)
+    private List<Endpoint> RetrieveEndpointsFromConfig(string configValue)
+    {
+        var endpoints = new List<Endpoint>();
+        foreach (var endpoint in configValue.Split(';'))
+        {
+            var endpointProperties = endpoint.Split('|');
+            if (endpointProperties?.Count() == 4)
+            {
+                endpoints.Add(new Endpoint(endpointProperties[0], endpointProperties[1], endpointProperties[2], endpointProperties[3], _configuration["TokenEndpointUrl"]));
+            }
+        }
+        return endpoints;
+    }
+
+    private IActionResult? HandleAuthorization(StringValues authorization, out string? audience)
     {
         audience = null;
         if (string.IsNullOrEmpty(authorization)) return null;
@@ -62,19 +92,17 @@ public class CapabilitiesController : ControllerBase
         catch (Exception e)
         {
             _logger.LogWarning("Invalid authorization header, further checks needed. Message: {msg}", e.Message);
-            try
+            if (e.Message.StartsWith("IDX10223"))
             {
-                _authenticationService.ValidateToken(_configuration["ClientId"], authorization[0].Replace("Bearer ", ""), int.MaxValue, false, false);
                 return new UnauthorizedObjectResult("Token has expired.");
             }
-            catch
+            else
             {
                 return new BadRequestObjectResult("Invalid token format");
             }
         }
 
-        var jwtHandler = new JwtSecurityTokenHandler();
-        var jwtToken = jwtHandler.ReadJwtToken(token);
+        var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
         audience = jwtToken.Claims.Where(c => c.Type == "aud").First().Value;
 
         _logger.LogInformation("Valid authentication and authorization.");
