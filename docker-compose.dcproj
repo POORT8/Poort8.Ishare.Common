@@ -14,5 +14,11 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="mac.yml">
+      <DependentUpon>docker-compose.override.yml</DependentUpon>
+    </None>
+    <None Include="windows.yml">
+      <DependentUpon>docker-compose.override.yml</DependentUpon>
+    </None>
   </ItemGroup>
 </Project>

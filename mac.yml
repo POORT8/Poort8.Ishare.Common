@@ -1,0 +1,7 @@
+﻿version: '3.4'
+
+services:
+  certvolumes:
+    volumes:
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
