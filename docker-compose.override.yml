@@ -12,6 +12,14 @@ services:
       - CertificateChainPassword=
       - SchemeOwnerUrl=https://scheme.isharetest.net
       - SchemeOwnerIdentifier=EU.EORI.NL000000000
+      - IshareRole=
+      - ApiVersion=
+      - TokenEndpointId=
+      - TokenEndpointUrl=
+      - CapabilitiesEndpointId=
+      - CapabilitiesEndpointUrl=
+      - PublicEndpoints=
+      - PrivateEndpoints=
     ports:
       - "80"
       - "443"
