@@ -47,11 +47,11 @@ public class CapabilitiesController : ControllerBase
             new Endpoint(_configuration["CapabilitiesEndpointId"], "capabilities", "Retrieves iSHARE capabilities", _configuration["CapabilitiesEndpointUrl"], _configuration["TokenEndpointUrl"])
         };
         publicEndpoints.AddRange(RetrieveEndpointsFromConfig(_configuration["PublicEndpoints"]));
-        capabilitiesInfo.SupportedVersions.First().SupportedFeatures.First().Public.AddRange(publicEndpoints);
+        capabilitiesInfo.SupportedVersions.First().SupportedFeatures.Add(new PublicEndpoints(publicEndpoints));
 
         if (audience is not null)
         {
-            capabilitiesInfo.SupportedVersions.First().SupportedFeatures.First().Restricted = RetrieveEndpointsFromConfig(_configuration["PrivateEndpoints"]);
+            capabilitiesInfo.SupportedVersions.First().SupportedFeatures.Add(new RestrictedEndpoints(RetrieveEndpointsFromConfig(_configuration["PrivateEndpoints"])));
         }
         var additionalClaims = new List<Claim> { new Claim("capabilities_info", JsonSerializer.Serialize(capabilitiesInfo), JsonClaimValueTypes.Json) };
 

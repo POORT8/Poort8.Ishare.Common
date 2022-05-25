@@ -36,26 +36,33 @@ public class SupportedVersion
     public SupportedVersion(string version)
     {
         Version = version;
-        SupportedFeatures = new List<SupportedFeature> { new SupportedFeature() };
+        SupportedFeatures = new List<object>();
     }
     [JsonPropertyName("version")]
     public string Version { get; set; }
 
     [JsonPropertyName("supported_features")]
-    public List<SupportedFeature> SupportedFeatures { get; set; }
+    public List<object> SupportedFeatures { get; set; }
 }
 
-public class SupportedFeature
+public class PublicEndpoints
 {
-    public SupportedFeature()
+    public PublicEndpoints(List<Endpoint> publicEndpoints)
     {
-        Public = new List<Endpoint>();
+        Public = publicEndpoints;
     }
     [JsonPropertyName("public")]
     public List<Endpoint> Public { get; set; }
+}
+
+public class RestrictedEndpoints
+{
+    public RestrictedEndpoints(List<Endpoint> restrictedEndpoints)
+    {
+        Restricted = restrictedEndpoints;
+    }
     [JsonPropertyName("restricted")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<Endpoint>? Restricted { get; set; }
+    public List<Endpoint> Restricted { get; set; }
 }
 
 public class Endpoint
