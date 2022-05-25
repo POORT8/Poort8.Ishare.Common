@@ -42,7 +42,7 @@ public class TokenController : ControllerBase
 
         try
         {
-            _authenticationService.ValidateToken(request.ClientId, request.ClientAssertion);
+            _authenticationService.ValidateToken(request.ClientId, request.ClientAssertion, 30, false);
         }
         catch (Exception e)
         {
