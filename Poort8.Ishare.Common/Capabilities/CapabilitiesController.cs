@@ -55,7 +55,7 @@ public class CapabilitiesController : ControllerBase
         }
         var additionalClaims = new List<Claim> { new Claim("capabilities_info", JsonSerializer.Serialize(capabilitiesInfo), JsonClaimValueTypes.Json) };
 
-        var token = _authenticationService.CreateClientAssertion(audience);
+        var token = _authenticationService.CreateTokenWithClaims(audience, additionalClaims);
         var capabilitiesResponse = new CapabilitiesResponse(token);
 		return new OkObjectResult(capabilitiesResponse);
 	}
