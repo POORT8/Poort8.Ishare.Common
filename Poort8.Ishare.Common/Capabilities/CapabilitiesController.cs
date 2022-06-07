@@ -55,7 +55,7 @@ public class CapabilitiesController : ControllerBase
         }
         var additionalClaims = new List<Claim> { new Claim("capabilities_info", JsonSerializer.Serialize(capabilitiesInfo), JsonClaimValueTypes.Json) };
 
-        var token = _authenticationService.CreateTokenWithClaims(audience, additionalClaims);
+        var token = _authenticationService.CreateTokenWithClaims(audience!, additionalClaims);
         var capabilitiesResponse = new CapabilitiesResponse(token);
 		return new OkObjectResult(capabilitiesResponse);
 	}
@@ -80,7 +80,7 @@ public class CapabilitiesController : ControllerBase
         if (string.IsNullOrEmpty(authorization)) return null;
         if (authorization.Count != 1 || !authorization[0].StartsWith("Bearer "))
         {
-            return new BadRequestObjectResult("Invalid token format");
+            return new BadRequestObjectResult("Invalid token format: not a bearer token");
         }
 
         var token = authorization[0].Replace("Bearer ", "");
@@ -92,14 +92,7 @@ public class CapabilitiesController : ControllerBase
         catch (Exception e)
         {
             _logger.LogWarning("Invalid authorization header, further checks needed. Message: {msg}", e.Message);
-            if (e.Message.StartsWith("IDX10223"))
-            {
-                return new UnauthorizedObjectResult("Token has expired.");
-            }
-            else
-            {
-                return new BadRequestObjectResult("Invalid token format");
-            }
+            return new UnauthorizedObjectResult("Invalid bearer token");
         }
 
         var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
