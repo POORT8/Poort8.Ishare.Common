@@ -19,24 +19,24 @@ $fileContentBytes = Get-Content <test-certificate.p12> -Encoding Byte -Raw
 docker pull ghcr.io/poort8/poort8.ishare.common:latest
 ```
  4. Set the following environment variables:
-    - ClientId > Your EORI, for example: EU.EORI.NL888888881
-    - SchemeOwnerUrl > Use the iSHARE scheme owner url of the test environment: https://scheme.isharetest.net
-    - SchemeOwnerIdentifier > Use the EORI of the iSHARE scheme owner: EU.EORI.NL000000000
-    - Certificate > Your iSHARE test certificate as a byte stream as created in step 2.
-    - CertificatePassword > The password of the iSHARE test certificate.
-    - CertificateChain > The certificates of the [iSHARE Test CA](https://dev.ishareworks.org/demo-and-testing/test-certificates.html#ishare-test-ca) as a comma separated byte stream. Use step 2 to get these. In case your certificate is issued by _C=NL, O=iSHARE Foundation, CN=TEST iSHARE Foundation PKIoverheid Organisatie Server CA - G3_, you can use [this](https://raw.githubusercontent.com/POORT8/Poort8.Ishare.Common/master/ishare-test-ca-chain.txt) chain.
-    - CertificateChainPassword > Empty string for public test certificates: ""
-    - IshareRole > Your role in the iSHARE scheme. Should be one of the following values: [Authorization Registry, Scheme Owner, Service Provider](https://ishareworks.atlassian.net/wiki/spaces/IS/pages/70222187/Glossary)
-    - ApiVersion > The version of your iSHARE API
-    - TokenEndpointId > A self chosen GUID to identify your token endpoint. You can generate one on [GuidGen](https://www.guidgen.com)
-    - TokenEndpointUrl > The URL of your token endpoint. Usually your api address appended with /token
-    - CapabilitiesEndpointId > A self chosen GUID to identify your capabilities endpoint. You can generate one on [GuidGen](https://www.guidgen.com)
-    - CapabilitiesEndpointUrl > The URL of your capabilities endpoint. Usually your api address appended with /capabilities
-    - PublicEndpoints > A semicolon separated string to represent all of your public iSHARE endpoints. The values of the endpoint itself are pipe separated, for example:
+- ClientId > Your EORI, for example: EU.EORI.NL888888881
+- SchemeOwnerUrl > Use the iSHARE scheme owner url of the test environment: https://scheme.isharetest.net
+- SchemeOwnerIdentifier > Use the EORI of the iSHARE scheme owner: EU.EORI.NL000000000
+- Certificate > Your iSHARE test certificate as a byte stream as created in step 2.
+- CertificatePassword > The password of the iSHARE test certificate.
+- CertificateChain > The certificates of the [iSHARE Test CA](https://dev.ishareworks.org/demo-and-testing/test-certificates.html#ishare-test-ca) as a comma separated byte stream. Use step 2 to get these. In case your certificate is issued by _C=NL, O=iSHARE Foundation, CN=TEST iSHARE Foundation PKIoverheid Organisatie Server CA - G3_, you can use [this](https://raw.githubusercontent.com/POORT8/Poort8.Ishare.Common/master/ishare-test-ca-chain.txt) chain.
+- CertificateChainPassword > Empty string for public test certificates: ""
+- IshareRole > Your role in the iSHARE scheme. Should be one of the following values: [Authorization Registry, Scheme Owner, Service Provider](https://ishareworks.atlassian.net/wiki/spaces/IS/pages/70222187/Glossary)
+- ApiVersion > The version of your iSHARE API
+- TokenEndpointId > A self chosen GUID to identify your token endpoint. You can generate one on [GuidGen](https://www.guidgen.com)
+- TokenEndpointUrl > The URL of your token endpoint. Usually your api address appended with /token
+- CapabilitiesEndpointId > A self chosen GUID to identify your capabilities endpoint. You can generate one on [GuidGen](https://www.guidgen.com)
+- CapabilitiesEndpointUrl > The URL of your capabilities endpoint. Usually your api address appended with /capabilities
+- PublicEndpoints > A semicolon separated string to represent all of your public iSHARE endpoints. The values of the endpoint itself are pipe separated, for example:
 ```
 GUID-public-endpoint-1|name-public-endpoint-1|description-public-endpoint-1|https://endpoints.myapi.com/public-endpoint-1;GUID-public-endpoint-2|name-public-endpoint-2|description-public-endpoint-2|https://endpoints.myapi.com/public-endpoint-2
 ```
-    - PrivateEndpoints > Like PublicEndpoints, a semicolon separated string to represent all of your private iSHARE endpoints, for example:
+- PrivateEndpoints > Like PublicEndpoints, a semicolon separated string to represent all of your private iSHARE endpoints, for example:
 ```
 GUID-private-endpoint-1|name-private-endpoint-1|description-private-endpoint-1|https://endpoints.myapi.com/private-endpoint-1;GUID-private-endpoint-2|name-private-endpoint-2|description-private-endpoint-2|https://endpoints.myapi.com/private-endpoint-2
 ```
