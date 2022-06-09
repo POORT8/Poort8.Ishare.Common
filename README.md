@@ -7,7 +7,6 @@ The project contains the *common endpoints* of the [iSHARE scheme](https://dev.i
  - [Capabilities](https://dev.ishareworks.org/common/capabilities.html)
 
 ## Getting Started
-
  1. First you need to have an iSHARE test certificate. You can request one [here](https://dev.ishareworks.org/demo-and-testing/test-certificates.html).
  2. For now, the certificate is provided to the docker container as a (secret) environment variable. Extract the byte stream from the certificate file (p12 of pfx). For example using PowerShell:
 ```
@@ -41,6 +40,8 @@ GUID-public-endpoint-1|name-public-endpoint-1|description-public-endpoint-1|http
 GUID-private-endpoint-1|name-private-endpoint-1|description-private-endpoint-1|https://endpoints.myapi.com/private-endpoint-1;GUID-private-endpoint-2|name-private-endpoint-2|description-private-endpoint-2|https://endpoints.myapi.com/private-endpoint-2
 ```
 
-## Acknowledgements
+## Comformance Test Tool
+This container is successfully tested against the [iSHARE Conformance Test Tool](https://dev.ishareworks.org/demo-and-testing/ctt.html). This means that the capabilities and token endpoints are implemented in conformance with the iSHARE specification. The test results can be found here. Note that one test fails, but we are certain the the test is incorrect, not the response :)
 
+## Acknowledgements
 This package was developed with partial funding from the Dutch Topsector Logistics.
