@@ -41,7 +41,7 @@ GUID-private-endpoint-1|name-private-endpoint-1|description-private-endpoint-1|h
 ```
 
 ## Conformance Test ✅
-This container ([release 0.2.0](https://github.com/POORT8/Poort8.Ishare.Common/pkgs/container/poort8.ishare.common/24709356?tag=v0.2.0)) is successfully tested against the [iSHARE Conformance Test Tool](https://dev.ishareworks.org/demo-and-testing/ctt.html). This means that the _capabilities_ and _token_ endpoints are implemented in conformance with the iSHARE specification. The test results can be found [here](https://github.com/POORT8/Poort8.Ishare.Common/blob/ctt-results/CTT.LOSUKVFUJM.pdf). Note that one test fails, but we are certain that the test is incorrect, not the response :)
+This container ([release 0.2.0](https://github.com/POORT8/Poort8.Ishare.Common/pkgs/container/poort8.ishare.common/24709356?tag=v0.2.0)) is successfully tested against the [iSHARE Conformance Test Tool](https://dev.ishareworks.org/demo-and-testing/ctt.html). This means that the _capabilities_ and _token_ endpoints are implemented in conformance with the iSHARE specification. The test results can be found [here](https://github.com/POORT8/Poort8.Ishare.Common/blob/master/CTT.LOSUKVFUJM.pdf). Note that one test fails, but we are certain that the test is incorrect, not the response :)
 
 ## Acknowledgements
 This package was developed with partial funding from the Dutch Topsector Logistics.
