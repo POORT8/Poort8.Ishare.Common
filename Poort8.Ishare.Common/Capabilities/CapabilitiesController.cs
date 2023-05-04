@@ -40,18 +40,18 @@ public class CapabilitiesController : ControllerBase
         var errorResponse = HandleAuthorization(authorization, out string? audience);
         if (errorResponse is not null) return errorResponse;
 
-        var capabilitiesInfo = new CapabilitiesInfo(_configuration["ClientId"], new List<string> { _configuration["IshareRole"] }, _configuration["ApiVersion"]);
+        var capabilitiesInfo = new CapabilitiesInfo(_configuration["ClientId"]!, new List<string> { _configuration["IshareRole"]! }, _configuration["ApiVersion"]!);
         var publicEndpoints = new List<Endpoint>
         {
-            new Endpoint(_configuration["TokenEndpointId"], "access token", "Obtains access token", _configuration["TokenEndpointUrl"]),
-            new Endpoint(_configuration["CapabilitiesEndpointId"], "capabilities", "Retrieves iSHARE capabilities", _configuration["CapabilitiesEndpointUrl"], _configuration["TokenEndpointUrl"])
+            new Endpoint(_configuration["TokenEndpointId"]!, "access token", "Obtains access token", _configuration["TokenEndpointUrl"]!),
+            new Endpoint(_configuration["CapabilitiesEndpointId"]!, "capabilities", "Retrieves iSHARE capabilities", _configuration["CapabilitiesEndpointUrl"]!, _configuration["TokenEndpointUrl"]!)
         };
-        publicEndpoints.AddRange(RetrieveEndpointsFromConfig(_configuration["PublicEndpoints"]));
+        publicEndpoints.AddRange(RetrieveEndpointsFromConfig(_configuration["PublicEndpoints"]!));
         capabilitiesInfo.SupportedVersions.First().SupportedFeatures.Add(new PublicEndpoints(publicEndpoints));
 
         if (audience is not null)
         {
-            capabilitiesInfo.SupportedVersions.First().SupportedFeatures.Add(new RestrictedEndpoints(RetrieveEndpointsFromConfig(_configuration["PrivateEndpoints"])));
+            capabilitiesInfo.SupportedVersions.First().SupportedFeatures.Add(new RestrictedEndpoints(RetrieveEndpointsFromConfig(_configuration["PrivateEndpoints"]!)));
         }
         var additionalClaims = new List<Claim> { new Claim("capabilities_info", JsonSerializer.Serialize(capabilitiesInfo), JsonClaimValueTypes.Json) };
 
@@ -66,9 +66,9 @@ public class CapabilitiesController : ControllerBase
         foreach (var endpoint in configValue.Split(';'))
         {
             var endpointProperties = endpoint.Split('|');
-            if (endpointProperties?.Count() == 4)
+            if (endpointProperties?.Length == 4)
             {
-                endpoints.Add(new Endpoint(endpointProperties[0], endpointProperties[1], endpointProperties[2], endpointProperties[3], _configuration["TokenEndpointUrl"]));
+                endpoints.Add(new Endpoint(endpointProperties[0], endpointProperties[1], endpointProperties[2], endpointProperties[3], _configuration["TokenEndpointUrl"]!));
             }
         }
         return endpoints;
@@ -78,16 +78,16 @@ public class CapabilitiesController : ControllerBase
     {
         audience = null;
         if (string.IsNullOrEmpty(authorization)) return null;
-        if (authorization.Count != 1 || !authorization[0].StartsWith("Bearer "))
+        if (authorization.Count != 1 || authorization[0]?.StartsWith("Bearer ") != true)
         {
             return new BadRequestObjectResult("Invalid token format: not a bearer token");
         }
 
-        var token = authorization[0].Replace("Bearer ", "");
+        var token = authorization[0]!.Replace("Bearer ", "");
 
         try
         {
-            _authenticationService.ValidateAuthorizationHeader(_configuration["ClientId"], authorization);
+            _authenticationService.ValidateAuthorizationHeader(_configuration["ClientId"]!, authorization);
         }
         catch (Exception e)
         {
