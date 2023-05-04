@@ -66,7 +66,7 @@ public class CapabilitiesController : ControllerBase
         foreach (var endpoint in configValue.Split(';'))
         {
             var endpointProperties = endpoint.Split('|');
-            if (endpointProperties?.Count() == 4)
+            if (endpointProperties?.Length == 4)
             {
                 endpoints.Add(new Endpoint(endpointProperties[0], endpointProperties[1], endpointProperties[2], endpointProperties[3], _configuration["TokenEndpointUrl"]!));
             }
@@ -83,7 +83,7 @@ public class CapabilitiesController : ControllerBase
             return new BadRequestObjectResult("Invalid token format: not a bearer token");
         }
 
-        var token = authorization[0]?.Replace("Bearer ", "");
+        var token = authorization[0]!.Replace("Bearer ", "");
 
         try
         {
