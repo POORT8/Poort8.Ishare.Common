@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Poort8.Ishare.Common.Capabilities;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class CapabilitiesController : ControllerBase
 {

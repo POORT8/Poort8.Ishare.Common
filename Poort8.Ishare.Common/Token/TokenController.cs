@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Poort8.Ishare.Common.Token;
 
-[Route("api/[controller]")]
+[Route("connect/[controller]")]
 [ApiController]
 public class TokenController : ControllerBase
 {
