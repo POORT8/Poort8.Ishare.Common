@@ -32,5 +32,5 @@ jobs:
         with:
           context: ./Poort8.Ishare.Common/
           push: true
-          tags: poort8/poort8.ishare.common-branch-experiment:v0.4.0
+          tags: ghcr.io/poort8/poort8.ishare.common-branch-experiment:v0.4.0
           
