@@ -30,6 +30,7 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v4
         with:
+          file: Poort8.Ishare.Common/Dockerfile
           push: true
           tags: ghcr.io/poort8/poort8.ishare.common-branch-experiment:v0.4.0
           
