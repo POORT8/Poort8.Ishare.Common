@@ -9,7 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["Poort8.Ishare.Common.csproj", "."]
 RUN dotnet restore "./Poort8.Ishare.Common.csproj"
-COPY ["Poort8.Ishare.Core.csproj", "."]
+COPY ["Poort8.Ishare.Core/Poort8.Ishare.Core.csproj", "."]
 RUN dotnet restore "./Poort8.Ishare.Core.csproj"
 COPY . .
 WORKDIR "/src/."
