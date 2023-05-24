@@ -12,8 +12,11 @@
   <ItemGroup>
     <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
-    <PackageReference Include="Poort8.Ishare.Core" Version="1.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Poort8.Ishare.Core\Poort8.Ishare.Core\Poort8.Ishare.Core.csproj" />
   </ItemGroup>
 
 </Project>
