@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Poort8.Ishare.Core;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
@@ -40,6 +41,12 @@ public class TokenController : ControllerBase
             return new BadRequestObjectResult("Invalid grant_type, scope or client_assertion_type.");
         }
 
+        if (!request.RegistrarId.IsNullOrEmpty() && request.RegistrarId!.Split('@').Length != 2)
+        {
+            _logger.LogWarning("Returning bad request - Invalid registrar_id: {registrar_id}", request.RegistrarId);
+            return new BadRequestObjectResult("Invalid registrar_id.");
+        }
+
         try
         {
             _authenticationService.ValidateToken(request.ClientId, request.ClientAssertion, 30, false);
@@ -52,7 +59,7 @@ public class TokenController : ControllerBase
 
         try
         {
-            await _schemeOwnerService.VerifyCertificateIsTrustedAsync(request.ClientAssertion);
+            await _schemeOwnerService.VerifyCertificateIsTrustedAsync(request.RegistrarId, request.ClientAssertion);
         }
         catch (Exception e)
         {
@@ -62,7 +69,7 @@ public class TokenController : ControllerBase
 
         try
         {
-            await _schemeOwnerService.VerifyPartyAsync(request.ClientId, request.ClientAssertion);
+            await _schemeOwnerService.VerifyPartyAsync(request.RegistrarId, request.ClientId, request.ClientAssertion);
         }
         catch (Exception e)
         {

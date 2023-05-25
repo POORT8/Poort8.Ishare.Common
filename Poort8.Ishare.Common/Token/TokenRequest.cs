@@ -17,6 +17,9 @@ public class TokenRequest
     [BindProperty(Name = "client_id")]
     public string ClientId { get; set; } = null!;
 
+    [BindProperty(Name = "registrar_id")]
+    public string RegistrarId { get; set; } = null!;
+
     [Required]
     [BindProperty(Name = "client_assertion_type")]
     public string ClientAssertionType { get; set; } = null!;

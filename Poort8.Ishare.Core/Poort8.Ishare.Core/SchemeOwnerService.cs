@@ -29,45 +29,44 @@ public class SchemeOwnerService : ISchemeOwnerService
     {
         _logger = logger;
         _configuration = configuration;
-        _memoryCache = memoryCache;
+        //_memoryCache = memoryCache;
 
         _httpClient = httpClientFactory.CreateClient(nameof(SchemeOwnerService));
-        _httpClient.BaseAddress = new Uri(configuration["SchemeOwnerUrl"]!);
 
         _authenticationService = authenticationService;
     }
 
-    private async Task<List<TrustedCertificateAuthority>> GetTrustedListAsync()
+    private async Task<List<TrustedCertificateAuthority>> GetTrustedListAsync(string? registrar)
     {
         List<TrustedCertificateAuthority> trustedList;
         if (_memoryCache == null)
         {
-            trustedList = await GetTrustedListAtSchemeOwnerAsync();
+            trustedList = await GetTrustedListAtSchemeOwnerAsync(registrar);
         }
         else
         {
             trustedList = await _memoryCache.GetOrAddAsync("TrustedList", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-                return await GetTrustedListAtSchemeOwnerAsync();
+                return await GetTrustedListAtSchemeOwnerAsync(registrar);
             });
         }
 
         return trustedList;
     }
 
-    private async Task<List<TrustedCertificateAuthority>> GetTrustedListAtSchemeOwnerAsync()
+    private async Task<List<TrustedCertificateAuthority>> GetTrustedListAtSchemeOwnerAsync(string? registrar)
     {
         try
         {
-            var tokenUri = new Uri(new Uri(_configuration["SchemeOwnerUrl"]!), "/connect/token");
-            var token = await _authenticationService.GetAccessTokenAtPartyAsync(_configuration["SchemeOwnerIdentifier"]!, tokenUri.AbsoluteUri);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.GetFromJsonAsync<TrustedListResponse>("/trusted_list");
+            var (uri, identifier) = GetUriAndIdentifier(registrar, "/trusted_list");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetToken(registrar));
+            var response = await _httpClient.GetFromJsonAsync<TrustedListResponse>(uri);
 
             if (response is null || response.TrustedListToken is null) { throw new Exception("TrustedList response is null."); }
 
-            _authenticationService.ValidateToken(_configuration["SchemeOwnerIdentifier"]!, response.TrustedListToken);
+            _authenticationService.ValidateToken(identifier, response.TrustedListToken);
 
             var handler = new JwtSecurityTokenHandler { MaximumTokenSizeInBytes = 1024 * 1024 * 2 };
             var trustedListToken = handler.ReadJwtToken(response.TrustedListToken);
@@ -90,37 +89,65 @@ public class SchemeOwnerService : ISchemeOwnerService
         }
     }
 
-    private async Task<PartyInfo> GetPartyAsync(string partyId, string certificateSubject)
+    private (Uri, string) GetUriAndIdentifier(string? registrar, string relativeUri)
+    {
+        Uri uri;
+        string identifier;
+        if (string.IsNullOrEmpty(registrar))
+        {
+            uri = new Uri(new Uri(_configuration["SchemeOwnerUrl"]!), relativeUri);
+            identifier = _configuration["SchemeOwnerIdentifier"]!;
+        }
+        else
+        {
+            var registrarUrl = registrar.Split('@')[1];
+            uri = new Uri(new Uri(registrarUrl.StartsWith("https://") ? registrarUrl : $"https://{registrarUrl}"), relativeUri);
+            identifier = registrar.Split('@')[0];
+        }
+
+        _logger.LogInformation("Using registrar {identifier} on url {url}", identifier, uri.AbsoluteUri);
+
+        return (uri, identifier);
+    }
+
+    private async Task<string> GetToken(string? registrar)
+    {
+        var (uri, identifier) = GetUriAndIdentifier(registrar, "/connect/token");
+        return await _authenticationService.GetAccessTokenAtPartyAsync(identifier, uri.AbsoluteUri);
+    }
+
+    private async Task<PartyInfo> GetPartyAsync(string? registrar, string partyId, string certificateSubject)
     {
         PartyInfo partyInfo;
         if (_memoryCache == null)
         {
-            partyInfo = await GetPartyAtSchemeOwnerAsync(partyId, certificateSubject);
+            partyInfo = await GetPartyAtSchemeOwnerAsync(registrar, partyId, certificateSubject);
         }
         else
         {
             partyInfo = await _memoryCache.GetOrAddAsync($"Party-{partyId}-{certificateSubject}", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
-                return await GetPartyAtSchemeOwnerAsync(partyId, certificateSubject);
+                return await GetPartyAtSchemeOwnerAsync(registrar, partyId, certificateSubject);
             });
         }
 
         return partyInfo;
     }
 
-    private async Task<PartyInfo> GetPartyAtSchemeOwnerAsync(string partyId, string certificateSubject)
+    private async Task<PartyInfo> GetPartyAtSchemeOwnerAsync(string? registrar, string partyId, string certificateSubject)
     {
         try
         {
-            var tokenUri = new Uri(new Uri(_configuration["SchemeOwnerUrl"]!), "/connect/token");
-            var token = await _authenticationService.GetAccessTokenAtPartyAsync(_configuration["SchemeOwnerIdentifier"]!, tokenUri.AbsoluteUri);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.GetFromJsonAsync<PartiesResponse>($"/parties?eori={partyId}&certificate_subject_name={certificateSubject}");
+            var relativeUri = $"/parties?eori={partyId}&certificate_subject_name={certificateSubject}";
+            var (uri, identifier) = GetUriAndIdentifier(registrar, relativeUri);
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetToken(registrar));
+            var response = await _httpClient.GetFromJsonAsync<PartiesResponse>(uri);
 
             if (response is null || response.PartiesToken is null) { throw new Exception("Parties response is null."); }
 
-            _authenticationService.ValidateToken(_configuration["SchemeOwnerIdentifier"]!, response.PartiesToken);
+            _authenticationService.ValidateToken(identifier, response.PartiesToken);
 
             var handler = new JwtSecurityTokenHandler { MaximumTokenSizeInBytes = 1024 * 1024 * 2 };
             var partiesToken = handler.ReadJwtToken(response.PartiesToken);
@@ -139,14 +166,14 @@ public class SchemeOwnerService : ISchemeOwnerService
         }
     }
 
-    public async Task VerifyCertificateIsTrustedAsync(string clientAssertion)
+    public async Task VerifyCertificateIsTrustedAsync(string? registrar, string clientAssertion)
     {
         var handler = new JwtSecurityTokenHandler { MaximumTokenSizeInBytes = 1024 * 1024 * 2 };
         var token = handler.ReadJwtToken(clientAssertion);
         var chain = JsonSerializer.Deserialize<string[]>(token.Header.X5c);
         if (chain is null) { throw new Exception("Empty x5c header."); }
 
-        var trustedList = await GetTrustedListAsync();
+        var trustedList = await GetTrustedListAsync(registrar);
 
         foreach (var chainCertificate in chain.Skip(1))
         {
@@ -170,7 +197,7 @@ public class SchemeOwnerService : ISchemeOwnerService
         }
     }
 
-    public async Task VerifyPartyAsync(string partyId, string clientAssertion)
+    public async Task VerifyPartyAsync(string? registrar, string partyId, string clientAssertion)
     {
         var handler = new JwtSecurityTokenHandler { MaximumTokenSizeInBytes = 1024 * 1024 * 2 };
         var token = handler.ReadJwtToken(clientAssertion);
@@ -178,7 +205,7 @@ public class SchemeOwnerService : ISchemeOwnerService
         if (chain is null) { throw new Exception("Empty x5c header."); }
         var signingCertificate = new X509Certificate2(Convert.FromBase64String(chain.First()));
 
-        var partyInfo = await GetPartyAsync(partyId, signingCertificate.Subject);
+        var partyInfo = await GetPartyAsync(registrar, partyId, signingCertificate.Subject);
 
         if (partyInfo is null ||
             partyInfo.Adherence?.Status is null ||

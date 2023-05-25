@@ -2,6 +2,6 @@
 
 public interface ISchemeOwnerService
 {
-    Task VerifyCertificateIsTrustedAsync(string clientAssertion);
-    Task VerifyPartyAsync(string partyId, string clientAssertion);
+    Task VerifyCertificateIsTrustedAsync(string? registrar, string clientAssertion);
+    Task VerifyPartyAsync(string? registrar, string partyId, string clientAssertion);
 }
