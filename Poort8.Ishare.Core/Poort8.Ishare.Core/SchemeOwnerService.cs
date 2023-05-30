@@ -105,7 +105,7 @@ public class SchemeOwnerService : ISchemeOwnerService
         }
         else
         {
-            uri = registrarUris[registrar];
+            uri = new Uri(registrarUris[registrar], relativeUri);
             identifier = registrar;
         }
 
