@@ -19,6 +19,11 @@ public class SchemeOwnerService : ISchemeOwnerService
     private readonly IAppCache? _memoryCache;
     private readonly HttpClient _httpClient;
     private readonly IAuthenticationService _authenticationService;
+    private readonly Dictionary<string, Uri> registrarUris = new()
+    {
+        { "EORI-BRANCH", new Uri("https://ds-admin.jomco.nl") },
+        { "EORI-BRANCH-O", new Uri("https://ds-admin-o.jomco.nl") }
+    };
 
     public SchemeOwnerService(
         ILogger<SchemeOwnerService> logger,
@@ -100,9 +105,8 @@ public class SchemeOwnerService : ISchemeOwnerService
         }
         else
         {
-            var registrarUrl = registrar.Split('@')[1];
-            uri = new Uri(new Uri(registrarUrl.StartsWith("https://") ? registrarUrl : $"https://{registrarUrl}"), relativeUri);
-            identifier = registrar.Split('@')[0];
+            uri = registrarUris[registrar];
+            identifier = registrar;
         }
 
         _logger.LogInformation("Using registrar {identifier} on url {url}", identifier, uri.AbsoluteUri);
