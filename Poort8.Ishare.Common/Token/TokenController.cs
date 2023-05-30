@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Poort8.Ishare.Core;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
@@ -39,12 +38,6 @@ public class TokenController : ControllerBase
             request.ClientAssertionType != "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
         {
             return new BadRequestObjectResult("Invalid grant_type, scope or client_assertion_type.");
-        }
-
-        if (!request.RegistrarId.IsNullOrEmpty() && request.RegistrarId!.Split('@').Length != 2)
-        {
-            _logger.LogWarning("Returning bad request - Invalid registrar_id: {registrar_id}", request.RegistrarId);
-            return new BadRequestObjectResult("Invalid registrar_id.");
         }
 
         try
