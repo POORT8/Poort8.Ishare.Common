@@ -105,8 +105,9 @@ public class SchemeOwnerService : ISchemeOwnerService
         }
         else
         {
-            uri = new Uri(registrarUris[registrar], relativeUri);
-            identifier = registrar;
+            var registrarIds = registrar.Split(',');
+            uri = new Uri(registrarUris[registrarIds[0]], relativeUri);
+            identifier = registrarIds[0];
         }
 
         _logger.LogInformation("Using registrar {identifier} on url {url}", identifier, uri.AbsoluteUri);
