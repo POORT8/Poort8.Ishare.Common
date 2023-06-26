@@ -144,7 +144,7 @@ public class SchemeOwnerService : ISchemeOwnerService
     {
         try
         {
-            var relativeUri = $"/parties?eori={partyId}&certificate_subject_name={certificateSubject}";
+            var relativeUri = $"/parties?eori={partyId}&registrar_id={registrar}&certificate_subject_name={certificateSubject}";
             var (uri, identifier) = GetUriAndIdentifier(registrar, relativeUri);
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetToken(registrar));
